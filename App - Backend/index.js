@@ -3,7 +3,7 @@ const connectToMongoDB = require('./database');
 connectToMongoDB();
 
 const app = express() // app as a Express Application 
-const port = 3000
+const port = 5000
 app.use(express.json()); // Middlewere to use body of Request //
 // Available Routes //
 app.get('/', (req, res) => {

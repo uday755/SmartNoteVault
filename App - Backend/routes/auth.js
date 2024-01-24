@@ -1,35 +1,38 @@
 const express = require("express");
 const userRouter = express.Router();
-const {body, validationResult} = require('express-validator');
+const { body, validationResult } = require('express-validator');
+const UserModel = require("../models/UserModel")
 
-const  UserModel  = require("../models/UserModel")
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { NoteModel } = require("../models/NoteModel");
 
-userRouter.post('/', [
-    body('name', 'Enter a Valid Name of Lenght at least 3').isLength({min : 3}),
+// Create a User Using POST Method on "/api/auth/createUser" . No Login is required
+userRouter.post('/createUser', [
+    body('name', 'Enter a Valid Name of Lenght at least 3').isLength({ min: 3 }),
     body('email', 'Enter a Valid Email').isEmail(),
     body('password', 'Password Lenght should be atleast 5').isLength({ min: 5 }),
-], async (req, res)=>{
-    // Validation Checks
+], async (req, res) => {
+    // Validation Checks and Returning Bad request and the errors
     const result = validationResult(req);
     if (!result.isEmpty()) {
-        res.status(400).send({ errors: result.array()});
+        res.status(400).send({ errors: result.array() });
     }
 
-    // Creating a New User //
-    UserModel.create({
-        name : req.body.name,
-        email : req.body.email,
-        password : req.body.password,
-    }).then(user =>{res.json(user)})
-    .catch(err =>{
-        console.log(err)
-        res.json({error: 'This Email ID is not Available, Try Something else'})
-    })
+    try {
+        // Check weather the user with this email exixts already
+        let user = await UserModel.findOne({ email: req.body.email });
+        if (user) return res.status(400).json({ error: "Sorry a User with this email already exists" })
 
-    // res.send(req.body);
+        // Creating a New User //
+        user = await UserModel.create({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+        })
+        res.json(user)
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Some Error Occured");
+    }
+
 })
 
 // // Create a User using : POST "/api/auth/" . Doesnt require authentication 
@@ -91,4 +94,4 @@ userRouter.post("/login", async (req, res) => {
     }
 })
 
-module.exports =  userRouter; 
+module.exports = userRouter; 
