@@ -1,17 +1,20 @@
 const express = require("express");
-const { UserModel } = require("../models/UserModel")
+const userRouter = express.Router();
+
+const  UserModel  = require("../models/UserModel")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { NoteModel } = require("../models/NoteModel");
 
-const userRouter = express.Router()
-
-userRouter.get("/", (req, res) => {
-    res.send({
-        message: "All The User "
-    })
+userRouter.post('/', (req, res)=>{
+    console.log(req.body);
+    // const {name, email, passsword} = req.body;
+    const user = new UserModel(req.body);
+    user.save();
+    res.send(req.body);
 })
 
+// Create a User using : POST "/api/auth/" . Doesnt require authentication 
 userRouter.post("/register", async (req, res) => {
     const { name, email, password } = req.body
     bcrypt.hash(password, 5, async function (err, hash) {
@@ -70,4 +73,4 @@ userRouter.post("/login", async (req, res) => {
     }
 })
 
-module.exports = { userRouter }
+module.exports =  userRouter; 

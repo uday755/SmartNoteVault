@@ -1,28 +1,19 @@
-const express = require("express");
-const cors = require("cors")
-const { connection } = require("./database");
-const { userRouter } = require("./routes/user.routes");
-require("dotenv").config();
-const port = process.env.PORT
-const app = express();
+const express = require("express"); // Importing the Express Framework/library
+const connectToMongoDB = require('./database');
+connectToMongoDB();
 
-app.use(cors());
-app.use(express.json());
-app.use("/user", userRouter);
-
-app.get("/",(req,res)=>{
-    res.send({
-        message : "API is Working Now"
-    })
+const app = express() // app as a Express Application 
+const port = 3000
+app.use(express.json()); // Middlewere to use body of Request //
+// Available Routes //
+app.get('/', (req, res) => {
+  res.send('Hello World of Full Stack Developers, I am Live from Backend at SmartNoteVault, A lot of things are going on in my side !')
 })
 
-app.listen(port, async()=>{
-    try {
-        await connection;
-        console.log("Database is Connected");
-    } catch (error) {
-        console.log(error);
-    }
+app.use('/api/auth', require('./routes/auth'));
+// app.use('/api/notes', require('./routes/notes'));
 
-    console.log("Server is Running on Port Number : " , port);
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
 })
