@@ -7,7 +7,7 @@ const port = 3000
 app.use(express.json()); // Middlewere to use body of Request //
 // Available Routes //
 app.get('/', (req, res) => {
-  res.send('Hello World of Full Stack Developers, I am Live from Backend at SmartNoteVault, A lot of things are going on in my side !')
+  res.send('We are Live from Backend at SmartNoteVault, A lot of things are going on in my side !')
 })
 
 app.use('/api/auth', require('./routes/auth'));

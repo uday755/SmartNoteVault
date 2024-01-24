@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const {Schema} = mongoose;
 
 const UserSchema =  mongoose.Schema({
     name : {type:String, required:true},// required : true ensures that this field is required
@@ -8,6 +7,7 @@ const UserSchema =  mongoose.Schema({
     date : {type : Date, default : Date.now}
 });
 
-const UserModel = mongoose.model("user", UserSchema);
 
+const UserModel = mongoose.model("user", UserSchema);
+UserModel.createIndexes();
 module.exports = UserModel;
