@@ -7,9 +7,9 @@ SmartNoteVault Provides Following Features :
 5. Update previous Notes
 6. Delet a Previous Notes
 
-SmartNoteVault is built using the latest Full Stack Technologies/Frameworks
-Front-end : React.js
-Back-end : Node.js, Express.js
-Database : MongoDB - a NoSQL Database
+SmartNoteVault is built using the latest Full Stack Technologies/Frameworks : 
+1. Front-end : React.js
+2. Back-end : Node.js, Express.js
+3. Database : MongoDB - a NoSQL Database
 
 For Any Queries/Bugs Reported write to : udaysinghtohana9@gmail.com.
