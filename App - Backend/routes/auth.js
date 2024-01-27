@@ -49,42 +49,82 @@ userRouter.post('/createUser', [
 
 })
 
-userRouter.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+// Authenticate a User using : POST  "api/auth/login". No Login Required
+userRouter.post("/login",[
+    body('email', 'Enter a Valid Email').isEmail(),
+    body('password', 'Password can not be blank').exists()
+    ], async (req, res) => {
+    // Validation Checks and Returning Bad request and the errors
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+        res.status(400).send({ errors: result.array() });
+    }
 
+    // For valid email and non blank password
+    const {email, password} = req.body;
     try {
-        let data = await UserModel.find({ email });
-        if (data.lenght > 0) {
-            let token = jwt.sign({ userId: data[0]._id }, "uday")
-            bcrypt.compare(password, data[0].password, function (err, result) {
-                if (err) return res.send({ message: "Something went Wrong" + err, status: 0 })
-                if (result) {
-                    res.send({
-                        message: "User Logged In Successfully",
-                        token: token,
-                        status: 1
-                    })
-                }
-                else {
-                    res.send({
-                        message: "Invalid User Password",
-                        // token:token,
-                        status: 0
-                    })
-                }
-            })
-        } else {
-            res.send({
-                message: "User Does Not Exist",
-                status: 0
-            })
+        let user = await UserModel.findOne({email}).exec();
+        // If user does not exist
+        if(!user){
+            return res.status(400).json({error : "Incorrect Credentials Entered"})
         }
+
+        // If User exixt
+        const passwordCompare = await bcrypt.compare(password, user.password);
+        if(!passwordCompare){
+            return res.status(400).json({error : "Incorrect Credentials Entered"})
+        }
+
+        // If Password matches
+        const data = {
+            user : {id : user.id}
+        }
+        const authToken =  jwt.sign(data, JWT_SECRET);
+        // console.log("Token : " + authToken);
+        res.json({authToken})
+
     } catch (error) {
-        res.send({
-            message: error.message,
-            status: 0
-        })
+        console.error(error.message);
+        res.status(500).send("Inernal Server Error");
     }
 })
+
+// userRouter.post("/login", async (req, res) => {
+//     const { email, password } = req.body;
+
+//     try {
+//         let data = await UserModel.find({ email });
+//         if (data.lenght > 0) {
+//             let token = jwt.sign({ userId: data[0]._id }, "uday")
+//             bcrypt.compare(password, data[0].password, function (err, result) {
+//                 if (err) return res.send({ message: "Something went Wrong" + err, status: 0 })
+//                 if (result) {
+//                     res.send({
+//                         message: "User Logged In Successfully",
+//                         token: token,
+//                         status: 1
+//                     })
+//                 }
+//                 else {
+//                     res.send({
+//                         message: "Invalid User Password",
+//                         // token:token,
+//                         status: 0
+//                     })
+//                 }
+//             })
+//         } else {
+//             res.send({
+//                 message: "User Does Not Exist",
+//                 status: 0
+//             })
+//         }
+//     } catch (error) {
+//         res.send({
+//             message: error.message,
+//             status: 0
+//         })
+//     }
+// })
 
 module.exports = userRouter; 
