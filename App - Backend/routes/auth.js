@@ -1,8 +1,10 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const userRouter = express.Router();
-const { body, validationResult } = require('express-validator');
-const UserModel = require("../models/UserModel")
-
+const { body, validationResult, buildCheckFunction } = require('express-validator');
+const UserModel = require("../models/UserModel");
+const JWT_SECRET = 'udayisagood@$boy';
 
 // Create a User Using POST Method on "/api/auth/createUser" . No Login is required
 userRouter.post('/createUser', [
@@ -21,40 +23,31 @@ userRouter.post('/createUser', [
         let user = await UserModel.findOne({ email: req.body.email });
         if (user) return res.status(400).json({ error: "Sorry a User with this email already exists" })
 
+        const salt = await bcrypt.genSalt(10);
+        const secPass = await bcrypt.hash(req.body.password, salt);
+
+
         // Creating a New User //
         user = await UserModel.create({
             name: req.body.name,
             email: req.body.email,
-            password: req.body.password,
+            password: secPass,
         })
-        res.json(user)
+
+        const data = {
+            user : {id : user.id}
+        }
+        const authToken =  jwt.sign(data, JWT_SECRET);
+        // console.log("Token : " + authToken);
+        res.json({authToken})
+
+        // res.json(user)
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Some Error Occured");
     }
 
 })
-
-// // Create a User using : POST "/api/auth/" . Doesnt require authentication 
-// userRouter.post("/register", async (req, res) => {
-//     const { name, email, password } = req.body
-//     bcrypt.hash(password, 5, async function (err, hash) {
-//         if (err) return res.send({ message: "Something went Wrong", status: 0 });
-//         try {
-//             let user = new UserModel({ name, email, password: hash })
-//             await user.save();
-//             res.send({
-//                 message: "User Created",
-//                 status: 1
-//             })
-//         } catch (error) {
-//             res.send({
-//                 message: error.message,
-//                 status: 0
-//             })
-//         }
-//     });
-// })
 
 userRouter.post("/login", async (req, res) => {
     const { email, password } = req.body;
