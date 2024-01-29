@@ -40,24 +40,52 @@ noteRouter.post("/addNote", fetchUser, [
     })
 
 // ROUTE :3 :: Update an existing Note for User using : PUT "/api/notes/updateNote" . Login Required
-noteRouter.put("/updateNote/:id", fetchUser, async (req, res)=>{
-    const {title, description, tag} = req.body;
+noteRouter.put("/updateNote/:id", fetchUser, async (req, res) => {
+    const { title, description, tag } = req.body;
     // Create a newNote object
-    const newNote = {};
-    if(title){newNote.title = title};
-    if(description){newNote.description = description};
-    if(tag){newNote.tag = tag};
+    try {
 
-    // Find the note to be updated and update it
-    let note = await NoteModel.findById(req.params.id);
-    if(!note){return res.status(404).send("Not Found")}
+        const newNote = {};
+        if (title) { newNote.title = title };
+        if (description) { newNote.description = description };
+        if (tag) { newNote.tag = tag };
 
-    if(note.user.toString() !== req.user.id){
-        return res.status(401).send("Unauthorised Access");
+        // Find the note to be updated and update it
+        let note = await NoteModel.findById(req.params.id);
+        if (!note) { return res.status(404).send("Not Found") }
+
+        if (note.user.toString() !== req.user.id) {
+            return res.status(401).send("Unauthorised Access");
+        }
+
+        note = await NoteModel.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true });
+        res.json({ note });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send(" Some Internal Server Error Occured ! We Will Get Back to you very soon");
     }
+})
 
-    note = await NoteModel.findByIdAndUpdate(req.params.id, {$set : newNote}, {new : true});
-    res.json({note});
+
+// ROUTE :3 :: Delete an existing Note for User using : DELETE "/api/notes/deleteNote" . Login Required
+noteRouter.delete("/deleteNote/:id", fetchUser, async (req, res) => {
+    try {
+
+        // Find the note to be deleted and delete it
+        let note = await NoteModel.findById(req.params.id);
+        if (!note) { return res.status(404).send("Not Found") }
+
+        // Allow user only if user owns this note
+        if (note.user.toString() !== req.user.id) {
+            return res.status(401).send("Unauthorised Access");
+        }
+
+        note = await NoteModel.findByIdAndDelete(req.params.id);
+        res.json({ "Success": "Deleted Note Successfully", note: note });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send(" Some Internal Server Error Occured ! We Will Get Back to you very soon");
+    }
 })
 
 module.exports = noteRouter;
