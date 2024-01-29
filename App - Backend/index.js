@@ -7,11 +7,13 @@ const port = 5000
 app.use(express.json()); // Middlewere to use body of Request //
 // Available Routes //
 app.get('/', (req, res) => {
-  res.send('We are Live from Backend at SmartNoteVault, A lot of things are going on in my side !')
+
+  res.send('We are Live from Backend at SmartNoteVault, A lot of things are going on in our side !')
+
 })
 
 app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/notes', require('./routes/notes'));
+app.use('/api/notes', require('./routes/notes'));
 
 
 app.listen(port, () => {

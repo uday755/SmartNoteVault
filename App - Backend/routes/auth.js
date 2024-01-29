@@ -103,4 +103,5 @@ userRouter.post("/getUser", fetchUser,  async (req, res) => {
     }
 })
 
+
 module.exports = userRouter; 
