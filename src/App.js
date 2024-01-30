@@ -1,10 +1,13 @@
 import './App.css';
+import Navbar from './Components/Navbar';
+import {Outlet} from 'react-router-dom'
 
 function App() {
   return (
-    <div className="App">
-      <h3>This is SmartNoteVault</h3>
-    </div>
+    <>
+    <Navbar/>
+    <Outlet/>
+    </>
   );
 }
 
