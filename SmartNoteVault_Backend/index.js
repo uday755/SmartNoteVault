@@ -1,8 +1,12 @@
 const express = require("express"); // Importing the Express Framework/library
+var cors = require('cors');
+
+
 const connectToMongoDB = require('./database');
 connectToMongoDB();
 
-const app = express() // app as a Express Application 
+const app = express() // app as a Express Application
+app.use(cors());
 const port = 5000
 app.use(express.json()); // Middlewere to use body of Request //
 // Available Routes //
