@@ -31,6 +31,7 @@ const NoteState = (props) => {
       },
       body: JSON.stringify({ title, description, tag }),
     });
+    console.log(response);
 
     const note =
     {
