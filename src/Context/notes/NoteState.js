@@ -36,7 +36,7 @@ const NoteState = (props) => {
 
     const note =
     {
-      "_id": "65b805bcd0c9f9cehcf9b62c32",
+      "_id": "65b805bcd0c9f9cecf9b62c32",
       "user": "65b6bae5f5b3846d8703f21a",
       "title": title,
       "description": description,
@@ -67,32 +67,37 @@ const NoteState = (props) => {
 
   // Edit Note
   const editNote = async (id, title, description, tag) => {
-    // API Call 
-    const response = await fetch(`${host}/api/notes/updateNote/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjViNmJhZTVmNWIzODQ2ZDg3MDNmMjFhIn0sImlhdCI6MTcwNjQ3NDI4MX0.8O3AtsClfK0Xlc1WA80bwXfu2minNNxA2SW00IgAvhQ"
-      },
-      body: JSON.stringify({ title, description, tag }),
-    });
-    const json = await response.json();
-    console.log(json);
+    try {
 
-    let newNotes = JSON.parse(JSON.stringify(notes))
-    // Logic to edit in client
-    for (let index = 0; index < newNotes.length; index++) {
-      const element = newNotes[index];
-      if (element._id === id) {
-        // newNotes[index]._id = id;
-        newNotes[index].title = title;
-        newNotes[index].description = description;
-        newNotes[index].tag = tag;
-        break;
+      // API Call 
+      const response = await fetch(`${host}/api/notes/updateNote/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjViNmJhZTVmNWIzODQ2ZDg3MDNmMjFhIn0sImlhdCI6MTcwNjQ3NDI4MX0.8O3AtsClfK0Xlc1WA80bwXfu2minNNxA2SW00IgAvhQ"
+        },
+        body: JSON.stringify({ title, description, tag }),
+      });
+      const json = await response.json();
+      console.log(json);
+
+      let newNotes = JSON.parse(JSON.stringify(notes))
+      // var newNotes = JSON.stringify(notes);
+      // Logic to edit in client
+      for (let index = 0; index < newNotes.length; index++) {
+        const element = newNotes[index];
+        if (element._id === id) {
+          newNotes[index].title = title;
+          newNotes[index].description = description;
+          newNotes[index].tag = tag;
+          break;
+        }
       }
+      console.log(newNotes);
+      setNotes(newNotes);
+    } catch (error) {
+      console.log("Not Able the Update Notes at this Moment , Have Patience we will up the API soon")
     }
-    console.log(newNotes);
-    setNotes(newNotes);
   }
 
   return (
