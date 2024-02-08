@@ -55,6 +55,7 @@ userRouter.post("/login", [
     body('email', 'Enter a Valid Email').isEmail(),
     body('password', 'Password can not be blank').exists()
 ], async (req, res) => {
+    let success = false;
     // Validation Checks and Returning Bad request and the errors
     const result = validationResult(req);
     if (!result.isEmpty()) {
@@ -67,13 +68,15 @@ userRouter.post("/login", [
         let user = await UserModel.findOne({ email }).exec();
         // If user does not exist
         if (!user) {
-            return res.status(400).json({ error: "Incorrect Credentials Entered" })
+            success = false;
+            return res.status(400).json({success, error: "Incorrect Credentials Entered" })
         }
 
         // If User exixt
         const passwordCompare = await bcrypt.compare(password, user.password);
         if (!passwordCompare) {
-            return res.status(400).json({ error: "Incorrect Credentials Entered" })
+            success = false;
+            return res.status(400).json({success, error: "Incorrect Credentials Entered" })
         }
 
         // If Password matches
@@ -82,7 +85,8 @@ userRouter.post("/login", [
         }
         const authToken = jwt.sign(data, JWT_SECRET);
         // console.log("Token : " + authToken);
-        res.json({ authToken })
+        success = true;
+        res.json({success, authToken })
 
     } catch (error) {
         console.error(error.message);
