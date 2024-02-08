@@ -37,7 +37,7 @@ const Login = () => {
 
 
     return (
-        <div>
+        <div className='container'>
             <h3 className='text-success'>Please Authnticate with your Registered Credentials </h3>
             <div className="container">
                 <form onSubmit={handleSubmit}>
