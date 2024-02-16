@@ -51,7 +51,6 @@ const Login = () => {
                         <input type="password" className="form-control" id="password" name='password' value={credentials.password} onChange={onChange} />
                     </div>
                     <button type="submit" className="btn btn-primary mx-1">Login</button>
-                    <button type="submit" className="btn btn-danger" >Forgot Password ?</button>
                     <h6 className='mx-2 my-2 text-danger'>Your privacy is protected by responsible data practices.</h6>
                 </form>
             </div>
