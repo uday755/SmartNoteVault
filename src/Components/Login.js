@@ -10,7 +10,7 @@ const Login = () => {
         e.preventDefault();
         try {
             console.log("Login Request Submitted");
-            const response = await fetch(`http://localhost:5000/api/auth/login`, {
+            const response = await fetch(`https://smartnotevault-backend.onrender.com/api/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

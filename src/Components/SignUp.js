@@ -11,7 +11,7 @@ const SignUp = () => {
     const { name, email, password } = credentials;
     try {
       console.log("Create User Request Submitted");
-      const response = await fetch(`http://localhost:5000/api/auth/createUser`, {
+      const response = await fetch(`https://smartnotevault-backend.onrender.com/api/auth/createUser`, {
 
         method: "POST",
         headers: {
