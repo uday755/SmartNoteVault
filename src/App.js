@@ -10,9 +10,7 @@ function App() {
       <NoteState>
         <Navbar />
         {/* <Alert message ="This is amazing React Library" /> */}
-        <div className="container">
         <Outlet />
-        </div>
       </NoteState>
     </>
   );
