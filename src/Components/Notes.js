@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import NoteContext from "../Context/notes/NoteContext"
 import NoteItem from './NoteItem';
 import AddNote from './AddNote';
+import { toast } from 'react-toastify';
 
 const Notes = () => {
     const context = useContext(NoteContext);
@@ -32,8 +33,14 @@ const Notes = () => {
             console.log("Updating the Note ...", note);
             await editNote(note.id, note.etitle, note.edescription, note.etag);
             setIsModalOpen(false);
+            toast.success("Note updated successfully!", {
+                style: { background: '#d4edda', color: '#155724' }
+            });
         } catch (error) {
             console.error("Error updating note:", error);
+            toast.error("Failed to update note. Please try again.", {
+                style: { background: '#f8d7da', color: '#721c24' }
+            });
         } finally {
             setIsUpdating(false);
         }
@@ -50,7 +57,7 @@ const Notes = () => {
             {/* Edit Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md animate-slide-up">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl animate-slide-up">
                         <div className="flex items-center justify-between p-6 border-b border-gray-200">
                             <h2 className="text-xl font-bold text-gray-900">Edit Note</h2>
                             <button
@@ -61,8 +68,8 @@ const Notes = () => {
                             </button>
                         </div>
                         
-                        <div className="p-6">
-                            <form className="space-y-4">
+                        <div className="p-8">
+                            <form className="space-y-6">
                                 <div>
                                     <label htmlFor="etitle" className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                                         <i className="fas fa-heading mr-2 text-blue-500"></i>
@@ -86,16 +93,16 @@ const Notes = () => {
                                         <i className="fas fa-align-left mr-2 text-blue-500"></i>
                                         Description
                                     </label>
-                                    <textarea 
-                                        className="input-modern min-h-[100px] resize-y" 
-                                        id="edescription" 
-                                        name="edescription" 
-                                        onChange={onChange} 
-                                        value={note.edescription} 
-                                        minLength={5} 
+                                    <textarea
+                                        className="input-modern min-h-[200px] resize-y"
+                                        id="edescription"
+                                        name="edescription"
+                                        onChange={onChange}
+                                        value={note.edescription}
+                                        minLength={5}
                                         required
                                         placeholder="Enter note description"
-                                        rows={4}
+                                        rows={8}
                                     />
                                 </div>
                                 
@@ -125,21 +132,21 @@ const Notes = () => {
                             >
                                 Cancel
                             </button>
-                            <button 
-                                disabled={note.etitle.length < 5 || note.edescription.length < 5 || isUpdating} 
-                                type="button" 
-                                className={`btn-gradient px-6 ${(note.etitle.length < 5 || note.edescription.length < 5 || isUpdating) ? 'opacity-50 cursor-not-allowed transform-none' : ''}`}
+                            <button
+                                disabled={note.etitle.length < 5 || note.edescription.length < 5 || isUpdating}
+                                type="button"
+                                className={`px-8 py-2 text-blue-500 font-semibold hover:text-blue-700 transition-all duration-200 ${(note.etitle.length < 5 || note.edescription.length < 5 || isUpdating) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 onClick={handleClick}
                             >
                                 {isUpdating ? (
                                     <div className="flex items-center">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
                                         Updating...
                                     </div>
                                 ) : (
                                     <div className="flex items-center">
-                                        <i className="fas fa-save mr-2"></i>
                                         Update Note
+                                        <i className="fas fa-save ml-2"></i>
                                     </div>
                                 )}
                             </button>

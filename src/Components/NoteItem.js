@@ -1,5 +1,6 @@
 import React, {useContext, useState} from 'react'
 import NoteContext from '../Context/notes/NoteContext';
+import { toast } from 'react-toastify';
 
 const NoteItem = (props) => {
     const context = useContext(NoteContext);
@@ -11,8 +12,14 @@ const NoteItem = (props) => {
         setIsDeleting(true);
         try {
             await deleteNote(note._id);
+            toast.success("Note deleted successfully!", {
+                style: { background: '#d4edda', color: '#155724' }
+            });
         } catch (error) {
             console.error("Error deleting note:", error);
+            toast.error("Failed to delete note. Please try again.", {
+                style: { background: '#f8d7da', color: '#721c24' }
+            });
         } finally {
             setIsDeleting(false);
         }
@@ -29,7 +36,7 @@ const NoteItem = (props) => {
 
     return (
         <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 p-3">
-            <div className="card-modern p-5 h-full flex flex-col group hover:scale-105 transition-all duration-300">
+            <div className="card-modern p-3 h-full flex flex-col group hover:scale-105 transition-all duration-300">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
@@ -44,7 +51,7 @@ const NoteItem = (props) => {
                     </div>
                     
                     {/* Action Buttons */}
-                    <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="flex items-center space-x-2">
                         <button
                             onClick={() => updateNote(note)}
                             className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"

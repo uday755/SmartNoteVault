@@ -2,15 +2,27 @@ import './App.css';
 import Navbar from './Components/Navbar';
 import { Outlet } from 'react-router-dom'
 import NoteState from './Context/notes/NoteState';
-// import Alert from './Components/Alert';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <>
       <NoteState>
         <Navbar />
-        {/* <Alert message ="This is amazing React Library" /> */}
         <Outlet />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </NoteState>
     </>
   );

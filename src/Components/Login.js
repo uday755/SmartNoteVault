@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 
 const Login = () => {
@@ -30,13 +31,20 @@ const Login = () => {
             if (json.success) {
                 // Save the auth token and Redirect
                 localStorage.setItem('token', json.authToken);
+                toast.success("Login successful! Welcome back.", {
+                    style: { background: '#d4edda', color: '#155724' }
+                });
                 navigate("/")
             } else {
-                setError("Invalid credentials. Please check your email and password.");
+                toast.error("Invalid credentials. Please check your email and password.", {
+                    style: { background: '#f8d7da', color: '#721c24' }
+                });
             }
         } catch (error) {
             console.log("Some Internal Server Error Occured.");
-            setError("Unable to connect to server. Please try again later.");
+            toast.error("Unable to connect to server. Please try again later.", {
+                style: { background: '#f8d7da', color: '#721c24' }
+            });
         } finally {
             setIsLoading(false);
         }

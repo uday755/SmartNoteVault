@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import NoteContext from "../Context/notes/NoteContext"
-import { useContext } from 'react'
+import { toast } from 'react-toastify'
 
 const AddNote = () => {
     const context = useContext(NoteContext);
@@ -14,8 +14,14 @@ const AddNote = () => {
         try {
             await addNote(note.title, note.description, note.tag || "General");
             setNote({title : "", description : "", tag:""});
+            toast.success("Note added successfully!", {
+                style: { background: '#d4edda', color: '#155724' }
+            });
         } catch (error) {
             console.error("Error adding note:", error);
+            toast.error("Failed to add note. Please try again.", {
+                style: { background: '#f8d7da', color: '#721c24' }
+            });
         } finally {
             setIsLoading(false);
         }
@@ -92,21 +98,21 @@ const AddNote = () => {
                     </div>
                     
                     <div className="flex justify-end">
-                        <button 
-                            disabled={note.title.length < 5 || note.description.length < 5 || isLoading} 
-                            type="submit" 
-                            className={`btn-gradient px-8 ${(note.title.length < 5 || note.description.length < 5 || isLoading) ? 'opacity-50 cursor-not-allowed transform-none' : ''}`}
+                        <button
+                            disabled={note.title.length < 5 || note.description.length < 5 || isLoading}
+                            type="submit"
+                            className={`px-8 py-2 text-blue-500 font-semibold hover:text-blue-700 transition-all duration-200 ${(note.title.length < 5 || note.description.length < 5 || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                             onClick={handleClick}
                         >
                             {isLoading ? (
                                 <div className="flex items-center">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
                                     Adding Note...
                                 </div>
                             ) : (
                                 <div className="flex items-center">
-                                    <i className="fas fa-plus mr-2"></i>
                                     Add Note
+                                    <i className="fas fa-plus ml-2"></i>
                                 </div>
                             )}
                         </button>

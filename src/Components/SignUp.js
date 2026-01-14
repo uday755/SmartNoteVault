@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const SignUp = () => {
   const [credentials, setCredentials] = useState({ name: "", email: "", password: "", cpassword: "" });
@@ -17,7 +18,9 @@ const SignUp = () => {
 
     // Validate passwords match
     if (credentials.password !== credentials.cpassword) {
-      setError("Passwords do not match");
+      toast.error("Passwords do not match", {
+        style: { background: '#f8d7da', color: '#721c24' }
+      });
       setIsLoading(false);
       return;
     }
@@ -38,13 +41,20 @@ const SignUp = () => {
       if (json.success) {
         // Save the auth token and Redirect
         localStorage.setItem('token', json.authToken);
+        toast.success("Account created successfully! Welcome.", {
+          style: { background: '#d4edda', color: '#155724' }
+        });
         navigate("/");
       } else {
-        setError("User already exists with this email address");
+        toast.error("User already exists with this email address", {
+          style: { background: '#f8d7da', color: '#721c24' }
+        });
       }
     } catch (error) {
       console.log("Some Internal Server Error Occured.");
-      setError("Unable to connect to server. Please try again later.");
+      toast.error("Unable to connect to server. Please try again later.", {
+        style: { background: '#f8d7da', color: '#721c24' }
+      });
     } finally {
       setIsLoading(false);
     }
