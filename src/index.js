@@ -7,6 +7,8 @@ import Home from './Components/Home';
 import About from './Components/About';
 import SignUp from './Components/SignUp';
 import Login from './Components/Login';
+import AddNote from './Components/AddNote';
+import EditNote from './Components/EditNote';
 
 const router = createBrowserRouter([
   {
@@ -24,9 +26,15 @@ const router = createBrowserRouter([
       },
       {
         path : "login", element:<Login/>
+      },
+      {
+        path : "notes/new-note", element:<AddNote/>
+      },
+      {
+        path : "notes/edit/:id", element:<EditNote/>
       }
     ]
-    
+
   }
 ])
 

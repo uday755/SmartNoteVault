@@ -3,6 +3,7 @@ import NoteContext from "./NoteContext"
 
 const NoteState = (props) => {
   const host = "https://smartnotevault-backend.onrender.com"
+  // const host = "http://localhost:5000"
   const notesInitial = [];
   const [notes, setNotes] = useState(notesInitial)
 
@@ -89,8 +90,24 @@ const NoteState = (props) => {
     }
   }
 
+  // Summarize Note with AI
+  const summarizeNote = async (id) => {
+    const response = await fetch(`${host}/api/ai/summarize/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token": localStorage.getItem('token')
+      }
+    });
+    const json = await response.json();
+    if (!json.success) {
+      throw new Error(json.error || "Failed to generate summary");
+    }
+    return json.summary;
+  }
+
   return (
-    <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNotes }}>
+    <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNotes, summarizeNote }}>
       {props.children}
     </NoteContext.Provider>
   )

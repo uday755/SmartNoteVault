@@ -1,28 +1,42 @@
-import React, { useState, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useContext, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import NoteContext from "../Context/notes/NoteContext"
 import { toast } from 'react-toastify'
 
-const AddNote = () => {
+const EditNote = () => {
     const context = useContext(NoteContext);
-    const { addNote } = context;
+    const { editNote } = context;
     const navigate = useNavigate();
-    const [note, setNote] = useState({title : "", description : "", tag:""})
+    const location = useLocation();
+    const currentNote = location.state?.note;
+
+    const [note, setNote] = useState({ title: "", description: "", tag: "" });
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (!currentNote) {
+            navigate('/');
+            return;
+        }
+        setNote({
+            title: currentNote.title,
+            description: currentNote.description,
+            tag: currentNote.tag || ""
+        });
+    }, [currentNote, navigate]);
 
     const handleClick = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await addNote(note.title, note.description, note.tag || "General");
-            setNote({title : "", description : "", tag:""});
-            toast.success("Note added successfully!", {
+            await editNote(currentNote._id, note.title, note.description, note.tag);
+            toast.success("Note updated successfully!", {
                 style: { background: '#d4edda', color: '#155724' }
             });
             navigate('/');
         } catch (error) {
-            console.error("Error adding note:", error);
-            toast.error("Failed to add note. Please try again.", {
+            console.error("Error updating note:", error);
+            toast.error("Failed to update note. Please try again.", {
                 style: { background: '#f8d7da', color: '#721c24' }
             });
         } finally {
@@ -31,7 +45,7 @@ const AddNote = () => {
     }
 
     const onChange = (e) => {
-        setNote({...note, [e.target.name] : e.target.value})
+        setNote({ ...note, [e.target.name]: e.target.value })
     }
 
     return (
@@ -47,10 +61,10 @@ const AddNote = () => {
                         <i className="fas fa-arrow-left text-lg"></i>
                     </button>
                     <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center mr-3">
-                            <i className="fas fa-plus text-white"></i>
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+                            <i className="fas fa-edit text-white"></i>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900">Add a New Note</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">Edit Note</h2>
                     </div>
                 </div>
 
@@ -128,12 +142,12 @@ const AddNote = () => {
                                 {isLoading ? (
                                     <div className="flex items-center">
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                        Adding Note...
+                                        Updating...
                                     </div>
                                 ) : (
                                     <div className="flex items-center">
-                                        <i className="fas fa-plus mr-2"></i>
-                                        Add Note
+                                        <i className="fas fa-save mr-2"></i>
+                                        Update Note
                                     </div>
                                 )}
                             </button>
@@ -145,4 +159,4 @@ const AddNote = () => {
     )
 }
 
-export default AddNote
+export default EditNote
