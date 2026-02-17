@@ -1,6 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from 'react-toastify';
+import { GoogleLogin } from '@react-oauth/google';
+import AuthImagePanel from './AuthImagePanel';
+
+const loadingMessages = [
+    "Waking up the server...",
+    "Setting up your account...",
+    "Almost there, hang tight...",
+    "Connecting to the cloud...",
+    "Securing your credentials...",
+    "Just a moment more...",
+    "Preparing your workspace...",
+    "Getting everything ready...",
+];
 
 const SignUp = () => {
   const [credentials, setCredentials] = useState({ name: "", email: "", password: "", cpassword: "" });
@@ -8,8 +21,24 @@ const SignUp = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loadingText, setLoadingText] = useState(loadingMessages[0]);
+  const intervalRef = useRef(null);
 
   let navigate = useNavigate()
+
+  useEffect(() => {
+      if (isLoading) {
+          let index = 0;
+          intervalRef.current = setInterval(() => {
+              index = (index + 1) % loadingMessages.length;
+              setLoadingText(loadingMessages[index]);
+          }, 2500);
+      } else {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          setLoadingText(loadingMessages[0]);
+      }
+      return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [isLoading]);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +57,7 @@ const SignUp = () => {
     const { name, email, password } = credentials;
     try {
       console.log("Create User Request Submitted");
-      const response = await fetch(`https://smartnotevault-backend.onrender.com/api/auth/createUser`, {
+      const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/auth/createUser`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -75,52 +104,7 @@ const SignUp = () => {
 
   return (
     <div className="h-screen w-screen flex overflow-hidden fixed inset-0">
-      {/* Left Side - Image (60%) */}
-      <div className="hidden lg:flex lg:w-3/5 relative overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url(/notes-img.avif)',
-          }}
-        >
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-slate-900 bg-opacity-40"></div>
-          
-          {/* Content over image */}
-          <div className="relative z-10 flex flex-col justify-center h-full px-8 xl:px-12 text-white">
-            <div className="max-w-lg">
-              <h1 className="text-4xl xl:text-5xl font-bold mb-6 leading-tight">
-                <span className="text-blue-400">Start your</span><br />
-                <span className="text-blue-400">journey</span>
-              </h1>
-              <p className="text-lg xl:text-xl font-medium text-white mb-8 leading-relaxed">
-                Join thousands of users who trust SmartNoteVault to keep their thoughts organized. 
-                Create your account and start capturing ideas today.
-              </p>
-              <div className="flex flex-col space-y-3 text-sm xl:text-base">
-                <div className="flex items-center text-white font-semibold">
-                  <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                    <i className="fas fa-users text-white text-xs"></i>
-                  </div>
-                  <span>10k+ Users</span>
-                </div>
-                <div className="flex items-center text-white font-semibold">
-                  <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                    <i className="fas fa-star text-white text-xs"></i>
-                  </div>
-                  <span>5-Star Rated</span>
-                </div>
-                <div className="flex items-center text-white font-semibold">
-                  <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                    <i className="fas fa-rocket text-white text-xs"></i>
-                  </div>
-                  <span>Fast Setup</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <AuthImagePanel />
 
       {/* Right Side - SignUp Form (40%) */}
       <div className="w-full lg:w-2/5 flex items-center justify-center p-4 lg:p-6 bg-white h-screen overflow-y-auto">
@@ -251,9 +235,12 @@ const SignUp = () => {
                 disabled={isLoading || !credentials.name || !credentials.email || !credentials.password || !credentials.cpassword}
               >
                 {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Creating account...
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Creating account...
+                    </div>
+                    <span className="text-xs text-gray-300 mt-1 animate-pulse">{loadingText}</span>
                   </div>
                 ) : (
                   'Create account'
@@ -261,6 +248,53 @@ const SignUp = () => {
               </button>
             </div>
           </form>
+
+          {/* Divider */}
+          <div className="mt-4 flex items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-3 text-sm text-gray-500">or</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+
+          {/* Google Sign-In */}
+          <div className="mt-4 flex justify-center">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                try {
+                  const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ credential: credentialResponse.credential })
+                  });
+                  const json = await response.json();
+                  if (json.success) {
+                    localStorage.setItem('token', json.authToken);
+                    toast.success("Account created successfully! Welcome.", {
+                      style: { background: '#d4edda', color: '#155724' }
+                    });
+                    navigate("/");
+                  } else {
+                    toast.error(json.error || "Google sign-up failed.", {
+                      style: { background: '#f8d7da', color: '#721c24' }
+                    });
+                  }
+                } catch (error) {
+                  console.error("Google sign-up error:", error);
+                  toast.error("Unable to connect to server. Please try again later.", {
+                    style: { background: '#f8d7da', color: '#721c24' }
+                  });
+                }
+              }}
+              onError={() => {
+                toast.error("Google sign-in failed. Please try again.", {
+                  style: { background: '#f8d7da', color: '#721c24' }
+                });
+              }}
+              text="signup_with"
+              shape="rectangular"
+              width="350"
+            />
+          </div>
 
           {/* Footer */}
           <div className="mt-5">

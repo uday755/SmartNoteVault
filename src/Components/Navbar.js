@@ -17,6 +17,11 @@ const Navbar = () => {
 
     const isActive = (path) => location.pathname === path;
 
+    // Hide navbar on login and signup pages
+    if (location.pathname === '/login' || location.pathname === '/createUser') {
+        return null;
+    }
+
     return (
         <nav className="navbar-modern sticky top-0 z-50 w-full">
             <div className="w-full px-4 sm:px-6 lg:px-8">

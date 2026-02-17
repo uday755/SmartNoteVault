@@ -32,7 +32,7 @@ const Notes = () => {
                     </div>
                     <button
                         onClick={() => navigate('/notes/new-note')}
-                        className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-all duration-200"
+                        className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700 rounded-lg transition-all duration-200"
                     >
                         New Note <i className="fas fa-plus ml-2"></i>
                     </button>
